@@ -1,0 +1,16 @@
+[project]
+name = "alpha-feature-tools"
+version = "0.0.1"
+description = "Feature Engineering Tools"
+authors = [
+    { name = "xiaotiancaipro", email = "xiaotiancaipro@163.com" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
