@@ -18,29 +18,47 @@ class BinaryCrossCombination(TransformerMixin, BaseEstimator):
 
     is_one_hot : bool, default=True
         Does need to perform one-hot encoding on the derived features
+
+    Examples
+    --------
+
+    >>> data = pd.DataFrame({
+    ...     "sex": ["M", "F", "M", "F"],
+    ...     "city": ["A", "B", "A", "C"],
+    ...     "age": [25, 30, 35, 40]
+    ... })
+    >>> bcc = BinaryCrossCombination(["sex", "city"], is_one_hot=True)
+    >>> bcc.fit(data)
+    BinaryCrossCombination(feature_names=['sex', 'city'])
+    >>> bcc.transform(data)
+       sex_&_city_F_&_B  sex_&_city_F_&_C  sex_&_city_M_&_A
+    0               0.0               0.0               1.0
+    1               1.0               0.0               0.0
+    2               0.0               0.0               1.0
+    3               0.0               1.0               0.0
     """
 
-    def __init__(self, feature_names: List[str], is_one_hot: bool = True):
-        self.__feature_names = feature_names
-        self.__is_one_hot = is_one_hot
+    def __init__(self, feature_names: List[str], *, is_one_hot: bool = True):
+        self.feature_names = feature_names
+        self.is_one_hot = is_one_hot
+        self.feature_names_in_ = None
         self.__encoder = OneHotEncoder(sparse=False)
         self.__combination_pairs = None
         self.__intermediate_feature = None
         self.__feature_names_out = None
-        self.feature_names_in_ = None
 
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None):
 
-        self._check_keywords(X, y)
+        self._validate_keywords(X, y)
 
         self.__combination_pairs, self.__intermediate_feature = list(), list()
-        for index, _1 in enumerate(self.__feature_names):
-            for _2 in self.__feature_names[index + 1:]:
+        for index, _1 in enumerate(self.feature_names):
+            for _2 in self.feature_names[index + 1:]:
                 self.__combination_pairs.append((_1, _2))
                 self.__intermediate_feature.append(_1 + "_&_" + _2)
 
         self.__feature_names_out = self.__intermediate_feature
-        if self.__is_one_hot:
+        if self.is_one_hot:
             intermediate_df = self._generate_intermediate_features(X)
             self.__encoder.fit(intermediate_df)
             self.__feature_names_out = self.__encoder.get_feature_names_out()
@@ -57,7 +75,7 @@ class BinaryCrossCombination(TransformerMixin, BaseEstimator):
 
         intermediate_df = self._generate_intermediate_features(X)
 
-        if self.__is_one_hot:
+        if self.is_one_hot:
             encoded = self.__encoder.transform(intermediate_df)
             return pd.DataFrame(encoded, columns=self.__feature_names_out, index=X.index)
 
@@ -66,16 +84,16 @@ class BinaryCrossCombination(TransformerMixin, BaseEstimator):
     def get_feature_names_out(self) -> np.ndarray:
         return self.__feature_names_out
 
-    def _check_keywords(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
+    def _validate_keywords(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
 
-        if len(self.__feature_names) < 2:
+        if len(self.feature_names) < 2:
             raise ValueError("At least two feature columns are required.")
 
-        missing_cols = set(self.__feature_names) - set(X.columns)
+        missing_cols = set(self.feature_names) - set(X.columns)
         if missing_cols:
             raise ValueError(f"The following columns are missing in the data frame: {missing_cols}")
 
-        self.feature_names_in_ = list(set(self.__feature_names))
+        self.feature_names_in_ = list(set(self.feature_names))
 
         return None
 
