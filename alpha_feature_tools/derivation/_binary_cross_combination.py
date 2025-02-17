@@ -1,5 +1,6 @@
 from typing import List
 
+import numpy as np
 import pandas as pd
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.exceptions import NotFittedError
@@ -62,7 +63,7 @@ class BinaryCrossCombination(TransformerMixin, BaseEstimator):
 
         return intermediate_df[self.__intermediate_feature]
 
-    def get_feature_names_out(self) -> List[str]:
+    def get_feature_names_out(self) -> np.ndarray:
         return self.__feature_names_out
 
     def _check_keywords(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
