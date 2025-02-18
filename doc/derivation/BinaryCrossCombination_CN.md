@@ -59,14 +59,20 @@ CrossCombination 转化器是用于在给定的数据集中生成多元交叉组
    运行结果
    ```txt
    new_features_data: 
-      fea_2_&_fea_3 fea_1_&_fea_2 fea_1_&_fea_3
-   0         A_&_1         Q_&_A         Q_&_1
-   1         B_&_1         W_&_B         W_&_1
-   2         A_&_3         W_&_A         W_&_3
-   3         C_&_4         Q_&_C         Q_&_4
-   new_features_list:  ['fea_2_&_fea_3', 'fea_1_&_fea_2', 'fea_1_&_fea_3']
+      CrossCombination_fea_1_&_fea_3 CrossCombination_fea_1_&_fea_2  \
+   0                          Q_&_1                          Q_&_A   
+   1                          W_&_1                          W_&_B   
+   2                          W_&_3                          W_&_A   
+   3                          Q_&_4                          Q_&_C   
+   
+     CrossCombination_fea_2_&_fea_3  
+   0                          A_&_1  
+   1                          B_&_1  
+   2                          A_&_3  
+   3                          C_&_4  
+   new_features_list:  ['CrossCombination_fea_1_&_fea_3', 'CrossCombination_fea_1_&_fea_2', 'CrossCombination_fea_2_&_fea_3']
    ```
-
+   
 2. 双变量交叉组合并对新特征执行 One-Hot 编码
    ```python
    import pandas as pd
@@ -97,32 +103,44 @@ CrossCombination 转化器是用于在给定的数据集中生成多元交叉组
    运行结果
    ```txt
    new_features_data: 
-       fea_2_&_fea_3_A_&_1  fea_2_&_fea_3_A_&_3  fea_2_&_fea_3_B_&_1  \
-   0                  1.0                  0.0                  0.0   
-   1                  0.0                  0.0                  1.0   
-   2                  0.0                  1.0                  0.0   
-   3                  0.0                  0.0                  0.0   
+       CrossCombination_fea_1_&_fea_3_Q_&_1  CrossCombination_fea_1_&_fea_3_Q_&_4  \
+   0                                   1.0                                   0.0   
+   1                                   0.0                                   0.0   
+   2                                   0.0                                   0.0   
+   3                                   0.0                                   1.0   
    
-      fea_2_&_fea_3_C_&_4  fea_1_&_fea_2_Q_&_A  fea_1_&_fea_2_Q_&_C  \
-   0                  0.0                  1.0                  0.0   
-   1                  0.0                  0.0                  0.0   
-   2                  0.0                  0.0                  0.0   
-   3                  1.0                  0.0                  1.0   
+      CrossCombination_fea_1_&_fea_3_W_&_1  CrossCombination_fea_1_&_fea_3_W_&_3  \
+   0                                   0.0                                   0.0   
+   1                                   1.0                                   0.0   
+   2                                   0.0                                   1.0   
+   3                                   0.0                                   0.0   
    
-      fea_1_&_fea_2_W_&_A  fea_1_&_fea_2_W_&_B  fea_1_&_fea_3_Q_&_1  \
-   0                  0.0                  0.0                  1.0   
-   1                  0.0                  1.0                  0.0   
-   2                  1.0                  0.0                  0.0   
-   3                  0.0                  0.0                  0.0   
+      CrossCombination_fea_1_&_fea_2_Q_&_A  CrossCombination_fea_1_&_fea_2_Q_&_C  \
+   0                                   1.0                                   0.0   
+   1                                   0.0                                   0.0   
+   2                                   0.0                                   0.0   
+   3                                   0.0                                   1.0   
    
-      fea_1_&_fea_3_Q_&_4  fea_1_&_fea_3_W_&_1  fea_1_&_fea_3_W_&_3  
-   0                  0.0                  0.0                  0.0  
-   1                  0.0                  1.0                  0.0  
-   2                  0.0                  0.0                  1.0  
-   3                  1.0                  0.0                  0.0  
-   new_features_list:  ['fea_2_&_fea_3_A_&_1', 'fea_2_&_fea_3_A_&_3', 'fea_2_&_fea_3_B_&_1', 'fea_2_&_fea_3_C_&_4', 'fea_1_&_fea_2_Q_&_A', 'fea_1_&_fea_2_Q_&_C', 'fea_1_&_fea_2_W_&_A', 'fea_1_&_fea_2_W_&_B', 'fea_1_&_fea_3_Q_&_1', 'fea_1_&_fea_3_Q_&_4', 'fea_1_&_fea_3_W_&_1', 'fea_1_&_fea_3_W_&_3']
+      CrossCombination_fea_1_&_fea_2_W_&_A  CrossCombination_fea_1_&_fea_2_W_&_B  \
+   0                                   0.0                                   0.0   
+   1                                   0.0                                   1.0   
+   2                                   1.0                                   0.0   
+   3                                   0.0                                   0.0   
+   
+      CrossCombination_fea_2_&_fea_3_A_&_1  CrossCombination_fea_2_&_fea_3_A_&_3  \
+   0                                   1.0                                   0.0   
+   1                                   0.0                                   0.0   
+   2                                   0.0                                   1.0   
+   3                                   0.0                                   0.0   
+   
+      CrossCombination_fea_2_&_fea_3_B_&_1  CrossCombination_fea_2_&_fea_3_C_&_4  
+   0                                   0.0                                   0.0  
+   1                                   1.0                                   0.0  
+   2                                   0.0                                   0.0  
+   3                                   0.0                                   1.0  
+   new_features_list:  ['CrossCombination_fea_1_&_fea_3_Q_&_1', 'CrossCombination_fea_1_&_fea_3_Q_&_4', 'CrossCombination_fea_1_&_fea_3_W_&_1', 'CrossCombination_fea_1_&_fea_3_W_&_3', 'CrossCombination_fea_1_&_fea_2_Q_&_A', 'CrossCombination_fea_1_&_fea_2_Q_&_C', 'CrossCombination_fea_1_&_fea_2_W_&_A', 'CrossCombination_fea_1_&_fea_2_W_&_B', 'CrossCombination_fea_2_&_fea_3_A_&_1', 'CrossCombination_fea_2_&_fea_3_A_&_3', 'CrossCombination_fea_2_&_fea_3_B_&_1', 'CrossCombination_fea_2_&_fea_3_C_&_4']
    ```
-
+   
 3. 三变量交叉组合
    ```python
    import pandas as pd
@@ -153,17 +171,29 @@ CrossCombination 转化器是用于在给定的数据集中生成多元交叉组
    运行结果
    ```txt
    new_features_data: 
-      fea_1_&_fea_3_&_fea_4 fea_1_&_fea_2_&_fea_4 fea_1_&_fea_2_&_fea_3  \
-   0             Q_&_1_&_6             Q_&_A_&_6             Q_&_A_&_1   
-   1             W_&_1_&_6             W_&_B_&_6             W_&_B_&_1   
-   2             W_&_3_&_6             W_&_A_&_6             W_&_A_&_3   
-   3             Q_&_4_&_7             Q_&_C_&_7             Q_&_C_&_4   
+      CrossCombination_fea_1_&_fea_2_&_fea_4  \
+   0                              Q_&_A_&_6   
+   1                              W_&_B_&_6   
+   2                              W_&_A_&_6   
+   3                              Q_&_C_&_7   
    
-     fea_2_&_fea_3_&_fea_4  
-   0             A_&_1_&_6  
-   1             B_&_1_&_6  
-   2             A_&_3_&_6  
-   3             C_&_4_&_7  
-   new_features_list:  ['fea_1_&_fea_3_&_fea_4', 'fea_1_&_fea_2_&_fea_4', 'fea_1_&_fea_2_&_fea_3', 'fea_2_&_fea_3_&_fea_4']
+     CrossCombination_fea_2_&_fea_3_&_fea_4  \
+   0                              A_&_1_&_6   
+   1                              B_&_1_&_6   
+   2                              A_&_3_&_6   
+   3                              C_&_4_&_7   
+   
+     CrossCombination_fea_1_&_fea_3_&_fea_4  \
+   0                              Q_&_1_&_6   
+   1                              W_&_1_&_6   
+   2                              W_&_3_&_6   
+   3                              Q_&_4_&_7   
+   
+     CrossCombination_fea_1_&_fea_2_&_fea_3  
+   0                              Q_&_A_&_1  
+   1                              W_&_B_&_1  
+   2                              W_&_A_&_3  
+   3                              Q_&_C_&_4  
+   new_features_list:  ['CrossCombination_fea_1_&_fea_2_&_fea_4', 'CrossCombination_fea_2_&_fea_3_&_fea_4', 'CrossCombination_fea_1_&_fea_3_&_fea_4', 'CrossCombination_fea_1_&_fea_2_&_fea_3']
    ```
 

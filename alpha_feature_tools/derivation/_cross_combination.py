@@ -1,4 +1,3 @@
-import itertools
 from typing import List
 
 import numpy as np
@@ -7,7 +6,7 @@ from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.exceptions import NotFittedError
 from sklearn.preprocessing import OneHotEncoder
 
-from ._base import StrBase
+from .._utils import feature_names_sep, find_unique_subsets
 
 
 class CrossCombination(TransformerMixin, BaseEstimator):
@@ -42,7 +41,7 @@ class CrossCombination(TransformerMixin, BaseEstimator):
     >>> cc.fit(data)
     CrossCombination(feature_names=['fea_1', 'fea_2', 'fea_3'])
     >>> cc.transform(data)
-      fea_1_&_fea_2 fea_2_&_fea_3 fea_1_&_fea_3
+      CrossCombination_fea_1_&_fea_2 CrossCombination_fea_2_&_fea_3 CrossCombination_fea_1_&_fea_3
     0         Q_&_A         A_&_1         Q_&_1
     1         W_&_B         B_&_1         W_&_1
     2         W_&_A         A_&_3         W_&_3
@@ -54,7 +53,7 @@ class CrossCombination(TransformerMixin, BaseEstimator):
     >>> cc.fit(data)
     CrossCombination(feature_names=['fea_1', 'fea_2', 'fea_3'], is_one_hot=True)
     >>> cc.transform(data)
-       fea_1_&_fea_2_Q_&_A  ...  fea_1_&_fea_3_W_&_3
+       CrossCombination_fea_1_&_fea_2_Q_&_A  ...  CrossCombination_fea_1_&_fea_3_W_&_3
     0                  1.0  ...                  0.0
     1                  0.0  ...                  0.0
     2                  0.0  ...                  1.0
@@ -67,7 +66,7 @@ class CrossCombination(TransformerMixin, BaseEstimator):
     >>> cc.fit(data)
     CrossCombination(feature_names=['fea_1', 'fea_2', 'fea_3', 'fea_4'], n=3)
     >>> cc.transform(data)
-      fea_1_&_fea_2_&_fea_3  ... fea_1_&_fea_2_&_fea_4
+      CrossCombination_fea_1_&_fea_2_&_fea_3  ... CrossCombination_fea_1_&_fea_2_&_fea_4
     0             Q_&_A_&_1  ...             Q_&_A_&_6
     1             W_&_B_&_1  ...             W_&_B_&_6
     2             W_&_A_&_3  ...             W_&_A_&_6
@@ -96,9 +95,9 @@ class CrossCombination(TransformerMixin, BaseEstimator):
         self._validate_keywords(X, y)
 
         self.__combination_pairs, self.__intermediate_feature = list(), list()
-        for subset in self.__find_unique_subsets(self.feature_names, self.n):
+        for subset in find_unique_subsets(self.feature_names_in_, self.n):
             self.__combination_pairs.append(subset)
-            self.__intermediate_feature.append(StrBase.SEP.join(subset))
+            self.__intermediate_feature.append(self.__class__.__name__ + "_" + feature_names_sep().join(subset))
 
         self.__feature_names_out = self.__intermediate_feature
         if self.is_one_hot:
@@ -146,11 +145,6 @@ class CrossCombination(TransformerMixin, BaseEstimator):
         intermediate_data = dict()
         for combination_pairs, combined_name in zip(self.__combination_pairs, self.__intermediate_feature):
             run_list = [f"X[combination_pairs[{_}]].astype(str)" for _ in range(len(combination_pairs))]
-            run_str = f" + \"{StrBase.SEP}\" + ".join(run_list)
+            run_str = f" + \"{feature_names_sep()}\" + ".join(run_list)
             intermediate_data[combined_name] = eval(run_str)
         return pd.DataFrame(data=intermediate_data, index=X.index)
-
-    def __find_unique_subsets(self, data: list, n: int = 2) -> list:
-        combinations = itertools.combinations(data, n)
-        unique_combinations = {tuple(sorted(_)) for _ in combinations}
-        return list(unique_combinations)
