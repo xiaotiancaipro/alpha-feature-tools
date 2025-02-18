@@ -1,5 +1,5 @@
-from ._binary_cross_combination import BinaryCrossCombination
+from ._cross_combination import CrossCombination
 
 __ALL__ = [
-    "BinaryCrossCombination"
+    "CrossCombination"
 ]
