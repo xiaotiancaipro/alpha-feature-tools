@@ -1,4 +1,4 @@
-from _base import data_example
+from tests._base import data_example
 from alpha_feature_tools.derivation import CrossCombination
 
 data = data_example()
