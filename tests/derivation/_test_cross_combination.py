@@ -3,11 +3,11 @@ from alpha_feature_tools.derivation import CrossCombination
 
 data = data_example()
 
-derivation = CrossCombination(["fea_1", "fea_2", "fea_3"])
-out = derivation.fit_transform(data)
+derivation = CrossCombination()
+out = derivation.fit_transform(data[["fea_1", "fea_2", "fea_3"]])
 print(out)
 
-derivation = CrossCombination(feature_names=["fea_1", "fea_2", "fea_3"], is_one_hot=True)
-derivation.fit(data)
+derivation = CrossCombination(is_one_hot=True)
+derivation.fit(data[["fea_1", "fea_2", "fea_3"]])
 out = derivation.transform(data)
 print(out)

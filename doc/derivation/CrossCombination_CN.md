@@ -45,32 +45,32 @@ CrossCombination 转化器是用于在给定的数据集中生成多元交叉组
    })
    
    # 示例化 CrossCombination 转化器
-   cc = derivation.CrossCombination(feature_names=["fea_1", "fea_2", "fea_3"])
+   cc = derivation.CrossCombination()
    
    # 拟合并转换数据
-   new_features_data = cc.fit_transform(data)
+   new_features_data = cc.fit_transform(data[["fea_1", "fea_2", "fea_3"]])
    print("new_features_data: \n", new_features_data)
    
    # 获取衍生后的新特征列表
    new_features_list = cc.get_feature_names_out()
-   print("new_features_list: ", list(new_features_list))
+   print("new_features_list: ", new_features_list)
    ```
 
    运行结果
    ```txt
    new_features_data: 
-      CrossCombination_fea_1_&_fea_3 CrossCombination_fea_1_&_fea_2  \
-   0                          Q_&_1                          Q_&_A   
-   1                          W_&_1                          W_&_B   
-   2                          W_&_3                          W_&_A   
-   3                          Q_&_4                          Q_&_C   
+      CrossCombination_fea_1_&_fea_3 CrossCombination_fea_2_&_fea_3  \
+   0                          Q_&_1                          A_&_1   
+   1                          W_&_1                          B_&_1   
+   2                          W_&_3                          A_&_3   
+   3                          Q_&_4                          C_&_4   
    
-     CrossCombination_fea_2_&_fea_3  
-   0                          A_&_1  
-   1                          B_&_1  
-   2                          A_&_3  
-   3                          C_&_4  
-   new_features_list:  ['CrossCombination_fea_1_&_fea_3', 'CrossCombination_fea_1_&_fea_2', 'CrossCombination_fea_2_&_fea_3']
+     CrossCombination_fea_1_&_fea_2  
+   0                          Q_&_A  
+   1                          W_&_B  
+   2                          W_&_A  
+   3                          Q_&_C  
+   new_features_list:  ['CrossCombination_fea_1_&_fea_3', 'CrossCombination_fea_2_&_fea_3', 'CrossCombination_fea_1_&_fea_2']
    ```
    
 2. 双变量交叉组合并对新特征执行 One-Hot 编码
@@ -89,15 +89,15 @@ CrossCombination 转化器是用于在给定的数据集中生成多元交叉组
    })
    
    # 示例化 CrossCombination 转化器
-   cc = derivation.CrossCombination(feature_names=["fea_1", "fea_2", "fea_3"], is_one_hot=True)
+   cc = derivation.CrossCombination(is_one_hot=True)
    
    # 拟合并转换数据
-   new_features_data = cc.fit_transform(data)
+   new_features_data = cc.fit_transform(data[["fea_1", "fea_2", "fea_3"]])
    print("new_features_data: \n", new_features_data)
    
    # 获取衍生后的新特征列表
    new_features_list = cc.get_feature_names_out()
-   print("new_features_list: ", list(new_features_list))
+   print("new_features_list: ", new_features_list)
    ```
 
    运行结果
@@ -157,15 +157,15 @@ CrossCombination 转化器是用于在给定的数据集中生成多元交叉组
    })
    
    # 示例化 CrossCombination 转化器
-   cc = derivation.CrossCombination(feature_names=["fea_1", "fea_2", "fea_3", "fea_4"], n=3)
+   cc = derivation.CrossCombination(n=3)
    
    # 拟合并转换数据
-   new_features_data = cc.fit_transform(data)
+   new_features_data = cc.fit_transform(data[["fea_1", "fea_2", "fea_3", "fea_4"]])
    print("new_features_data: \n", new_features_data)
    
    # 获取衍生后的新特征列表
    new_features_list = cc.get_feature_names_out()
-   print("new_features_list: ", list(new_features_list))
+   print("new_features_list: ", new_features_list)
    ```
 
    运行结果
