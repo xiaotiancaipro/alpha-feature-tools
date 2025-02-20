@@ -1,12 +1,11 @@
 import pandas as pd
-from sklearn.base import TransformerMixin, BaseEstimator
-from sklearn.exceptions import NotFittedError
 from sklearn.preprocessing import OneHotEncoder
 
+from ._base import _BaseTransformer
 from .._utils import feature_names_sep, find_unique_subsets
 
 
-class CrossCombination(TransformerMixin, BaseEstimator):
+class CrossCombination(_BaseTransformer):
     """
     Cross derivative transformer of categorical variables
 
@@ -68,65 +67,47 @@ class CrossCombination(TransformerMixin, BaseEstimator):
     [4 rows x 4 columns]
     """
 
-    def __init__(
-            self,
-            *,
-            n: int = 2,
-            is_one_hot: bool = False
-    ):
+    def __init__(self, *, n: int = 2, is_one_hot: bool = False):
         self.n = n
         self.is_one_hot = is_one_hot
-        self.feature_names_in_ = None
         self.__encoder = OneHotEncoder(sparse=False)
-        self.__combination_pairs = None
-        self.__intermediate_feature = None
-        self.__feature_names_out = None
+        self.__combination_pairs = list()
+        self.__intermediate_feature = list()
+        super().__init__()
 
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None):
 
         self._validate_keywords(X, y)
 
-        self.__combination_pairs, self.__intermediate_feature = list(), list()
         for subset in find_unique_subsets(self.feature_names_in_, self.n):
             self.__combination_pairs.append(subset)
             self.__intermediate_feature.append(self.__class__.__name__ + "_" + feature_names_sep().join(subset))
 
-        self.__feature_names_out = self.__intermediate_feature
+        self._feature_names_out = self.__intermediate_feature
         if self.is_one_hot:
-            intermediate_df = self._generate_intermediate_features(X)
+            intermediate_df = self.__generate_intermediate_features(X)
             self.__encoder.fit(intermediate_df)
-            self.__feature_names_out = self.__encoder.get_feature_names_out()
+            self._feature_names_out = list(self.__encoder.get_feature_names_out())
+
+        self._not_fitted = False
 
         return self
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-
-        if self.__feature_names_out is None:
-            raise NotFittedError(
-                f"This {self.__class__.__name__} instance is not fitted yet. "
-                "Call 'fit' with appropriate arguments before using this transformer."
-            )
-
-        intermediate_df = self._generate_intermediate_features(X)
-
+        self._validate_fitted(self.__class__.__name__)
+        intermediate_df = self.__generate_intermediate_features(X)
         if self.is_one_hot:
             encoded = self.__encoder.transform(intermediate_df)
-            return pd.DataFrame(encoded, columns=self.__feature_names_out, index=X.index)
-
+            return pd.DataFrame(encoded, columns=self._feature_names_out, index=X.index)
         return intermediate_df[self.__intermediate_feature]
 
-    def get_feature_names_out(self) -> list:
-        if isinstance(self.__feature_names_out, list):
-            return self.__feature_names_out
-        return list(self.__feature_names_out)
-
     def _validate_keywords(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
-        self.feature_names_in_ = X.columns.tolist()
+        super()._validate_keywords(X, y)
         if len(self.feature_names_in_) < self.n:
             raise ValueError(f"At least {self.n} feature columns are required.")
         return None
 
-    def _generate_intermediate_features(self, X: pd.DataFrame) -> pd.DataFrame:
+    def __generate_intermediate_features(self, X: pd.DataFrame) -> pd.DataFrame:
         intermediate_data = dict()
         for combination_pairs, combined_name in zip(self.__combination_pairs, self.__intermediate_feature):
             run_list = [f"X[combination_pairs[{_}]].astype(str)" for _ in range(len(combination_pairs))]

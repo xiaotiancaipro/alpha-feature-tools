@@ -1,13 +1,12 @@
 from typing import List
 
 import pandas as pd
-from sklearn.base import TransformerMixin, BaseEstimator
-from sklearn.exceptions import NotFittedError
 
+from ._base import _BaseTransformer
 from .._utils import find_unique_subsets
 
 
-class FourArithmetic(TransformerMixin, BaseEstimator):
+class FourArithmetic(_BaseTransformer):
     """
     Four arithmetic derivative transformer of continuous variables
 
@@ -58,52 +57,33 @@ class FourArithmetic(TransformerMixin, BaseEstimator):
     [4 rows x 4 columns]
     """
 
-    def __init__(
-            self,
-            *,
-            n: int = 2
-    ):
+    def __init__(self, *, n: int = 2):
         self.n = n
-        self.feature_names_in_ = None
         self.__four_arithmetic = ["+", "-", "*", "/"]
-        self.__combination_pairs = None
-        self.__feature_names_out = None
+        self.__combination_pairs = list()
+        super().__init__()
 
     def fit(self, X: pd.DataFrame, y: pd.Series = None):
-
         self._validate_keywords(X, y)
-
-        self.__combination_pairs, self.__feature_names_out = list(), list()
-        a = find_unique_subsets(self.feature_names_in_, self.n)
-        for subset in a:
+        for subset in find_unique_subsets(self.feature_names_in_, self.n):
             for arithmetic in self.__four_arithmetic:
                 self.__combination_pairs.append(subset)
-                self.__feature_names_out.append(self.__class__.__name__ + "_" + f"_{arithmetic}_".join(subset))
-
+                self._feature_names_out.append(self.__class__.__name__ + "_" + f"_{arithmetic}_".join(subset))
+        self._not_fitted = False
         return self
 
     def transform(self, X: pd.DataFrame):
-
-        if self.__feature_names_out is None:
-            raise NotFittedError(
-                f"This {self.__class__.__name__} instance is not fitted yet. "
-                "Call 'fit' with appropriate arguments before using this transformer."
-            )
-
+        self._validate_fitted(self.__class__.__name__)
         index = 0
-        for combination_pairs, feature_name in zip(self.__combination_pairs, self.__feature_names_out):
+        for combination_pairs, feature_name in zip(self.__combination_pairs, self._feature_names_out):
             run_list = [f"X[\"{_}\"]" for _ in combination_pairs]
             run_str = f" {self.__four_arithmetic[index % len(self.__four_arithmetic)]} ".join(run_list)
             X[feature_name] = eval(run_str)
             index += 1
-
-        return X[self.__feature_names_out]
-
-    def get_feature_names_out(self) -> list:
-        return self.__feature_names_out
+        return X[self._feature_names_out]
 
     def _validate_keywords(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
-        self.feature_names_in_ = X.columns.tolist()
+        super()._validate_keywords(X, y)
         if len(self.feature_names_in_) < self.n:
             raise ValueError(f"At least {self.n} feature columns are required.")
         return None
