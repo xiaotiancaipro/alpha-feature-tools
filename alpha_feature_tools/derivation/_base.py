@@ -13,13 +13,16 @@ class _BaseTransformer(TransformerMixin, BaseEstimator):
     def get_feature_names_out(self) -> list:
         return self._feature_names_out
 
-    def _validate_fitted(self, transformer_name: str):
+    def _validate_fitted(self, transformer_name: str) -> None:
         if self._not_fitted:
             raise NotFittedError(
                 f"This {transformer_name} instance is not fitted yet. "
                 "Call 'fit' with appropriate arguments before using this transformer."
             )
+        return None
 
     def _validate_keywords(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
+        if not isinstance(X, pd.DataFrame):
+            raise TypeError(f"X must be a pandas DataFrame, got {type(X)}")
         self.feature_names_in_ = X.columns.tolist()
         return None
