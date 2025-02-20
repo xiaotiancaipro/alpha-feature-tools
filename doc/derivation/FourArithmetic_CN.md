@@ -15,7 +15,6 @@ FourArithmetic 转化器是用于在给定的数据集中生成通过四则运�
 
 | 参数名        | 类型      | 默认值 | 描述                                                 |
 | :------------ | :-------- | :----: | :--------------------------------------------------- |
-| feature_names | List[str] |  必填  | 需要参与衍生的特征名称列表                           |
 | n             | int       |   2    | 每次进行四则运算组合的元素个数，默认为双变量四则运算 |
 
 
@@ -43,15 +42,15 @@ FourArithmetic 转化器是用于在给定的数据集中生成通过四则运�
    })
    
    # 示例化 FourArithmetic 转化器
-   fa = derivation.FourArithmetic(feature_names=["fea_1", "fea_2", "fea_3"])
+   fa = derivation.FourArithmetic()
    
    # 拟合并转换数据
-   new_features_data = fa.fit_transform(data)
+   new_features_data = fa.fit_transform(data[["fea_1", "fea_2", "fea_3"]])
    print("new_features_data: \n", new_features_data)
    
    # 获取衍生后的新特征列表
    new_features_list = fa.get_feature_names_out()
-   print("new_features_list: ", list(new_features_list))
+   print("new_features_list: ", new_features_list)
    ```
    
    运行结果
@@ -110,15 +109,15 @@ FourArithmetic 转化器是用于在给定的数据集中生成通过四则运�
    })
    
    # 示例化 FourArithmetic 转化器
-   fa = derivation.FourArithmetic(feature_names=["fea_1", "fea_2", "fea_3"], n=3)
+   fa = derivation.FourArithmetic(n=3)
    
    # 拟合并转换数据
-   new_features_data = fa.fit_transform(data)
+   new_features_data = fa.fit_transform(data[["fea_1", "fea_2", "fea_3"]])
    print("new_features_data: \n", new_features_data)
    
    # 获取衍生后的新特征列表
    new_features_list = fa.get_feature_names_out()
-   print("new_features_list: ", list(new_features_list))
+   print("new_features_list: ", new_features_list)
    ```
    
    运行结果

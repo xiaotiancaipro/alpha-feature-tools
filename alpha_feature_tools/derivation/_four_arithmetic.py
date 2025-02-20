@@ -13,9 +13,6 @@ class FourArithmetic(TransformerMixin, BaseEstimator):
 
     Parameters
     ----------
-    feature_names : List[str]
-        List of feature names to be transformed
-
     n : int, default=2
         The number of features calculated each time
 
@@ -35,10 +32,11 @@ class FourArithmetic(TransformerMixin, BaseEstimator):
     ... })
 
     Derivatied features of two continuous variables uesd four arithmetic operations
-    >>> fa = FourArithmetic(["fea_1", "fea_2"])
-    >>> fa.fit(data)
-    FourArithmetic(feature_names=['fea_1', 'fea_2'])
-    >>> fa.transform(data)
+
+    >>> fa = FourArithmetic()
+    >>> fa.fit(data[["fea_1", "fea_2"]])
+    FourArithmetic()
+    >>> fa.transform(data[["fea_1", "fea_2"]])
        FourArithmetic_fea_1_+_fea_2  ...  FourArithmetic_fea_1_/_fea_2
     0                      2.000000  ...                      2.000000
     1                      3.000000  ...                      3.000000
@@ -47,10 +45,11 @@ class FourArithmetic(TransformerMixin, BaseEstimator):
     [4 rows x 4 columns]
 
     Derivatied features of three continuous variables uesd four arithmetic operations
-    >>> fa = FourArithmetic(["fea_1", "fea_2", "fea_3"], n=3)
-    >>> fa.fit(data)
-    FourArithmetic(feature_names=['fea_1', 'fea_2', 'fea_3'], n=3)
-    >>> fa.transform(data)
+
+    >>> fa = FourArithmetic(n=3)
+    >>> fa.fit(data[["fea_1", "fea_2", "fea_3"]])
+    FourArithmetic(n=3)
+    >>> fa.transform(data[["fea_1", "fea_2", "fea_3"]])
        FourArithmetic_fea_1_+_fea_2_+_fea_3  ...  FourArithmetic_fea_1_/_fea_2_/_fea_3
     0                              0.333333  ...                              0.333333
     1                              0.500000  ...                              0.500000
@@ -61,11 +60,9 @@ class FourArithmetic(TransformerMixin, BaseEstimator):
 
     def __init__(
             self,
-            feature_names: List[str],
             *,
             n: int = 2
     ):
-        self.feature_names = feature_names
         self.n = n
         self.feature_names_in_ = None
         self.__four_arithmetic = ["+", "-", "*", "/"]
@@ -77,7 +74,8 @@ class FourArithmetic(TransformerMixin, BaseEstimator):
         self._validate_keywords(X, y)
 
         self.__combination_pairs, self.__feature_names_out = list(), list()
-        for subset in find_unique_subsets(self.feature_names_in_, self.n):
+        a = find_unique_subsets(self.feature_names_in_, self.n)
+        for subset in a:
             for arithmetic in self.__four_arithmetic:
                 self.__combination_pairs.append(subset)
                 self.__feature_names_out.append(self.__class__.__name__ + "_" + f"_{arithmetic}_".join(subset))
@@ -92,11 +90,12 @@ class FourArithmetic(TransformerMixin, BaseEstimator):
                 "Call 'fit' with appropriate arguments before using this transformer."
             )
 
+        index = 0
         for combination_pairs, feature_name in zip(self.__combination_pairs, self.__feature_names_out):
-            run_list = [f"X[combination_pairs[{_}]]" for _ in range(len(combination_pairs))]
-            run_str_list = [f"{_}".join(run_list) for _ in self.__four_arithmetic]
-            for run_str in run_str_list:
-                X[feature_name] = eval(run_str)
+            run_list = [f"X[\"{_}\"]" for _ in combination_pairs]
+            run_str = f" {self.__four_arithmetic[index % len(self.__four_arithmetic)]} ".join(run_list)
+            X[feature_name] = eval(run_str)
+            index += 1
 
         return X[self.__feature_names_out]
 
@@ -104,16 +103,7 @@ class FourArithmetic(TransformerMixin, BaseEstimator):
         return self.__feature_names_out
 
     def _validate_keywords(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
-
-        feature_names_set = set(self.feature_names)
-
-        if len(feature_names_set) < self.n:
+        self.feature_names_in_ = X.columns.tolist()
+        if len(self.feature_names_in_) < self.n:
             raise ValueError(f"At least {self.n} feature columns are required.")
-
-        missing_cols = feature_names_set - set(X.columns)
-        if missing_cols:
-            raise ValueError(f"The following columns are missing in the data frame: {missing_cols}.")
-
-        self.feature_names_in_ = list(feature_names_set)
-
         return None

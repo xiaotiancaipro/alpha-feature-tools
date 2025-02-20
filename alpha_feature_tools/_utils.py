@@ -26,4 +26,4 @@ def find_unique_subsets(data: list, n: int = 2) -> list:
     """
     combinations = itertools.combinations(data, n)
     unique_combinations = {tuple(sorted(_)) for _ in combinations}
-    return list(unique_combinations)
+    return list(sorted(unique_combinations))
