@@ -72,7 +72,7 @@ class FourArithmetic(_BaseTransformer):
         self._not_fitted = False
         return self
 
-    def transform(self, X: pd.DataFrame):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         self._validate_fitted(self.__class__.__name__)
         index = 0
         for combination_pairs, feature_name in zip(self.__combination_pairs, self._feature_names_out):
