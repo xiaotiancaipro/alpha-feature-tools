@@ -1,15 +1,24 @@
-from alpha_feature_tools.preprocess import LabelEncoder, OneHotEncoder
+import pandas as pd
 
-le = LabelEncoder()
-le.fit(["paris", "paris", "tokyo", "amsterdam"])
-print(list(le.classes_))
-le.transform(["tokyo", "tokyo", "paris"])
-print(list(le.inverse_transform([2, 2, 1])))
-out = le.fit_transform(["tokyo", "tokyo", "paris"])
-print(out)
+from alpha_feature_tools.preprocess import OrdinalEncoder, OneHotEncoder
 
-ohe = OneHotEncoder(sparse=False)
-out = ohe.fit_transform([['Male', 1], ['Female', 3], ['Female', 2]])
-print(out)
-print(ohe.categories_)
+data = pd.DataFrame(
+    data=[
+        ['Male', "paris", 0],
+        ['Female', "paris", 1],
+        ['Female', "tokyo", 1]
+    ],
+    columns=["sex", "city", "label"]
+)
+X = data[["sex", "city"]]
+y = data["label"]
 
+oe = OrdinalEncoder()
+oe.fit(X, y)
+print(oe.transform(X))
+print(oe.get_feature_names_out())
+
+oh = OneHotEncoder(sparse=False)
+oh.fit(X, y)
+print(oh.transform(X))
+print(oh.get_feature_names_out())

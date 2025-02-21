@@ -1,6 +1,7 @@
-from ._encoder import LabelEncoder, OneHotEncoder
+from ._encoder import LabelEncoder, OrdinalEncoder, OneHotEncoder
 
 __ALL__ = [
     "LabelEncoder",
+    "OrdinalEncoder",
     "OneHotEncoder"
 ]
