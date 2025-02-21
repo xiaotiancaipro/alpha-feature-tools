@@ -47,8 +47,7 @@ class NPolynomial(_BaseTransformer):
         self.__combination_pairs = list()
         super().__init__()
 
-    def fit(self, X: pd.DataFrame, y=None):
-        self._validate_keywords(X, y)
+    def _fit(self, X: pd.DataFrame, y=None) -> None:
         for subset in find_unique_subsets(self.feature_names_in_, self.n):
             feature_poly_all = [{key: val} for val in range(1, self.n_ + 1) for key in subset]
             for feature_poly in feature_poly_all:
@@ -67,11 +66,9 @@ class NPolynomial(_BaseTransformer):
                     self.__combination_pairs.append(combination_pairs)
                     feature_name_out = "*".join([f"{key}**{val}" for key, val in combination_pairs.items()])
                     self._feature_names_out.append(f"{self.__class__.__name__}_{feature_name_out}")
-        self._not_fitted = False
-        return self
+        return None
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        self._validate_fitted(self.__class__.__name__)
+    def _transform(self, X: pd.DataFrame) -> pd.DataFrame:
         for combination_pairs, feature_name in zip(self.__combination_pairs, self._feature_names_out):
             temp_feature_name = list()
             for key, val in combination_pairs.items():

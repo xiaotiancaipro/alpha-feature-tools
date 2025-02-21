@@ -63,17 +63,14 @@ class FourArithmetic(_BaseTransformer):
         self.__combination_pairs = list()
         super().__init__()
 
-    def fit(self, X: pd.DataFrame, y: pd.Series = None):
-        self._validate_keywords(X, y)
+    def _fit(self, X: pd.DataFrame, y: pd.Series = None) -> None:
         for subset in find_unique_subsets(self.feature_names_in_, self.n):
             for arithmetic in self.__four_arithmetic:
                 self.__combination_pairs.append(subset)
                 self._feature_names_out.append(self.__class__.__name__ + "_" + f"_{arithmetic}_".join(subset))
-        self._not_fitted = False
-        return self
+        return None
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        self._validate_fitted(self.__class__.__name__)
+    def _transform(self, X: pd.DataFrame) -> pd.DataFrame:
         index = 0
         for combination_pairs, feature_name in zip(self.__combination_pairs, self._feature_names_out):
             run_list = [f"X[\"{_}\"]" for _ in combination_pairs]

@@ -75,26 +75,18 @@ class CrossCombination(_BaseTransformer):
         self.__intermediate_feature = list()
         super().__init__()
 
-    def fit(self, X: pd.DataFrame, y: pd.Series | None = None):
-
-        self._validate_keywords(X, y)
-
+    def _fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
         for subset in find_unique_subsets(self.feature_names_in_, self.n):
             self.__combination_pairs.append(subset)
-            self.__intermediate_feature.append(self.__class__.__name__ + "_" + feature_names_sep().join(subset))
-
+            self.__intermediate_feature.append(f"{self.__class__.__name__}_{feature_names_sep().join(subset)}")
         self._feature_names_out = self.__intermediate_feature
         if self.is_one_hot:
             intermediate_df = self.__generate_intermediate_features(X)
             self.__encoder.fit(intermediate_df)
             self._feature_names_out = list(self.__encoder.get_feature_names_out())
+        return None
 
-        self._not_fitted = False
-
-        return self
-
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        self._validate_fitted(self.__class__.__name__)
+    def _transform(self, X: pd.DataFrame) -> pd.DataFrame:
         intermediate_df = self.__generate_intermediate_features(X)
         if self.is_one_hot:
             encoded = self.__encoder.transform(intermediate_df)
@@ -110,7 +102,7 @@ class CrossCombination(_BaseTransformer):
     def __generate_intermediate_features(self, X: pd.DataFrame) -> pd.DataFrame:
         intermediate_data = dict()
         for combination_pairs, combined_name in zip(self.__combination_pairs, self.__intermediate_feature):
-            run_list = [f"X[combination_pairs[{_}]].astype(str)" for _ in range(len(combination_pairs))]
+            run_list = [f"X[\"{_}\"].astype(str)" for _ in combination_pairs]
             run_str = f" + \"{feature_names_sep()}\" + ".join(run_list)
             intermediate_data[combined_name] = eval(run_str)
         return pd.DataFrame(data=intermediate_data, index=X.index)
