@@ -2,7 +2,7 @@ from typing import List
 
 import pandas as pd
 
-from ._base import _BaseTransformer
+from .._base import _BaseTransformer
 from .._utils import find_unique_subsets
 
 
@@ -63,7 +63,7 @@ class FourArithmetic(_BaseTransformer):
         self.__combination_pairs = list()
         super().__init__()
 
-    def _fit(self, X: pd.DataFrame, y: pd.Series = None) -> None:
+    def _fit(self, X: pd.DataFrame, y=None) -> None:
         for subset in find_unique_subsets(self.feature_names_in_, self.n):
             for arithmetic in self.__four_arithmetic:
                 self.__combination_pairs.append(subset)
@@ -79,8 +79,8 @@ class FourArithmetic(_BaseTransformer):
             index += 1
         return X[self._feature_names_out]
 
-    def _validate_keywords(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
-        super()._validate_keywords(X, y)
+    def _validate_keywords(self, X, y=None) -> tuple:
+        X, y = super()._validate_keywords(X, y)
         if len(self.feature_names_in_) < self.n:
             raise ValueError(f"At least {self.n} feature columns are required.")
-        return None
+        return X, y

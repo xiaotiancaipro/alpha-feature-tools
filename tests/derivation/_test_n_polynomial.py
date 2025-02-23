@@ -8,7 +8,8 @@ X = pd.DataFrame(
     ],
     columns=["a", "b", "c", "d", "e"]
 )
-
 n_ploy = NPolynomial(n=2, n_=2)
 n_ploy.fit(X)
-print(sorted(n_ploy.get_feature_names_out()))
+out = n_ploy.transform(X)
+print(n_ploy.get_feature_names_out())
+print(out)

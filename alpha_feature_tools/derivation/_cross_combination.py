@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 
-from ._base import _BaseTransformer
+from .._base import _BaseTransformer
 from .._utils import feature_names_sep, find_unique_subsets
 
 
@@ -75,7 +75,7 @@ class CrossCombination(_BaseTransformer):
         self.__intermediate_feature = list()
         super().__init__()
 
-    def _fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
+    def _fit(self, X: pd.DataFrame, y=None) -> None:
         for subset in find_unique_subsets(self.feature_names_in_, self.n):
             self.__combination_pairs.append(subset)
             self.__intermediate_feature.append(f"{self.__class__.__name__}_{feature_names_sep().join(subset)}")
@@ -93,11 +93,11 @@ class CrossCombination(_BaseTransformer):
             return pd.DataFrame(encoded, columns=self._feature_names_out, index=X.index)
         return intermediate_df[self.__intermediate_feature]
 
-    def _validate_keywords(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
-        super()._validate_keywords(X, y)
+    def _validate_keywords(self, X, y=None) -> tuple:
+        X, y = super()._validate_keywords(X, y)
         if len(self.feature_names_in_) < self.n:
             raise ValueError(f"At least {self.n} feature columns are required.")
-        return None
+        return X, y
 
     def __generate_intermediate_features(self, X: pd.DataFrame) -> pd.DataFrame:
         intermediate_data = dict()

@@ -1,5 +1,6 @@
-import pandas as pd
 from abc import ABC, abstractmethod
+
+import pandas as pd
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.exceptions import NotFittedError
 
@@ -11,33 +12,38 @@ class _BaseTransformer(TransformerMixin, BaseEstimator, ABC):
         self._feature_names_out = list()
         self._not_fitted = True
 
-    def fit(self, X: pd.DataFrame, y: pd.Series | None = None):
-        self._validate_keywords(X, y)
-        self._fit(X, y)
+    def fit(self, X, y=None):
+        X_, y_ = self._validate_keywords(X, y)
+        self._fit(X_, y_)
         self._not_fitted = False
         return self
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+    def transform(self, X):
         if self._not_fitted:
             raise NotFittedError(
                 "This instance is not fitted yet. "
                 "Call 'fit' with appropriate arguments before using this transformer."
             )
-        return self._transform(X)
+        if not isinstance(X, pd.DataFrame):
+            X = pd.DataFrame(X)
+        if len(X.columns.tolist()) != len(self.feature_names_in_):
+            raise ValueError("The input feature column is inconsistent with the feature column during training")
+        X.columns = self.feature_names_in_
+        return self._transform(X).values
 
     def get_feature_names_out(self) -> list:
         return self._feature_names_out
 
+    def _validate_keywords(self, X, y=None) -> tuple:
+        if not isinstance(X, pd.DataFrame):
+            X = pd.DataFrame(X)
+        self.feature_names_in_ = X.columns.tolist()
+        return X, y
+
     @abstractmethod
-    def _fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
+    def _fit(self, X: pd.DataFrame, y=None) -> None:
         return None
 
     @abstractmethod
     def _transform(self, X: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame()
-
-    def _validate_keywords(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
-        if not isinstance(X, pd.DataFrame):
-            raise TypeError(f"X must be a pandas DataFrame, got {type(X)}")
-        self.feature_names_in_ = X.columns.tolist()
-        return None

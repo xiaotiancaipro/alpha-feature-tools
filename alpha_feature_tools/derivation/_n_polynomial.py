@@ -1,6 +1,6 @@
 import pandas as pd
 
-from ._base import _BaseTransformer
+from .._base import _BaseTransformer
 from .._utils import find_unique_subsets
 
 
@@ -79,12 +79,12 @@ class NPolynomial(_BaseTransformer):
                 temp_feature_name.append(feature_name)
         return X[self._feature_names_out]
 
-    def _validate_keywords(self, X: pd.DataFrame, y: pd.Series | None = None) -> None:
-        super()._validate_keywords(X, y)
+    def _validate_keywords(self, X, y=None) -> tuple:
+        X, y = super()._validate_keywords(X, y)
         if len(self.feature_names_in_) < self.n:
             raise ValueError(f"At least {self.n} feature columns are required.")
         if self.n_ < 2:
             raise ValueError(f"n_ must be greater than 1.")
         if self.n > self.n_:
             raise ValueError(f"n must be less than or equal to n_.")
-        return None
+        return X, y
