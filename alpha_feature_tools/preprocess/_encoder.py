@@ -101,7 +101,7 @@ class OrdinalEncoder(SKL_OrdinalEncoder):
     Given a dataset with two features, we let the encoder find the unique
     values per feature and transform the data to an ordinal encoding.
 
-    >>> from sklearn.preprocessing import OrdinalEncoder
+    >>> from alpha_feature_tools.preprocess import OrdinalEncoder
     >>> enc = OrdinalEncoder()
     >>> X = [['Male', 1], ['Female', 3], ['Female', 2]]
     >>> enc.fit(X)
@@ -179,16 +179,13 @@ class OneHotEncoder(SKL_OneHotEncoder):
           left intact.
         - array : ``drop[i]`` is the category in feature ``X[:, i]`` that
           should be dropped.
-    
-           The parameter `drop` was added in 0.21.
-        .. versionchanged:: 0.23
-           The option `drop='if_binary'` was added in 0.23.
-        .. versionchanged:: 1.1
-            Support for dropping infrequent categories.
+
     sparse : bool, default=True
         Will return sparse matrix if set True else will return an array.
+
     dtype : number type, default=float
         Desired dtype of output.
+
     handle_unknown : {'error', 'ignore', 'infrequent_if_exist'}, \
                      default='error'
         Specifies the way unknown categories are handled during :meth:`transform`.
@@ -208,9 +205,7 @@ class OneHotEncoder(SKL_OneHotEncoder):
           `handle_unknown='ignore'`. Infrequent categories exist based on
           `min_frequency` and `max_categories`. Read more in the
           :ref:`User Guide <one_hot_encoder_infrequent_categories>`.
-        .. versionchanged:: 1.1
-            `'infrequent_if_exist'` was added to automatically handle unknown
-            categories and infrequent categories.
+
     min_frequency : int or float, default=None
         Specifies the minimum frequency below which a category will be
         considered infrequent.
@@ -218,16 +213,13 @@ class OneHotEncoder(SKL_OneHotEncoder):
           infrequent.
         - If `float`, categories with a smaller cardinality than
           `min_frequency * n_samples`  will be considered infrequent.
-    
-            Read more in the :ref:`User Guide <one_hot_encoder_infrequent_categories>`.
+
     max_categories : int, default=None
         Specifies an upper limit to the number of output features for each input
         feature when considering infrequent categories. If there are infrequent
         categories, `max_categories` includes the category representing the
         infrequent categories along with the frequent categories. If `None`,
         there is no limit to the number of output features.
-    
-            Read more in the :ref:`User Guide <one_hot_encoder_infrequent_categories>`.
 
     Attributes
     ----------
@@ -236,6 +228,7 @@ class OneHotEncoder(SKL_OneHotEncoder):
         (in order of the features in X and corresponding with the output
         of ``transform``). This includes the category specified in ``drop``
         (if any).
+
     drop_idx_ : array of shape (n_features,)
         - ``drop_idx_[i]`` is the index in ``categories_[i]`` of the category
           to be dropped for each feature.
@@ -248,15 +241,14 @@ class OneHotEncoder(SKL_OneHotEncoder):
         `max_categories` to a non-default value and `drop_idx[i]` corresponds
         to a infrequent category, then the entire infrequent category is
         dropped.
-        .. versionchanged:: 0.23
-           Added the possibility to contain `None` values.
+
     infrequent_categories_ : list of ndarray
         Defined only if infrequent categories are enabled by setting
         `min_frequency` or `max_categories` to a non-default value.
         `infrequent_categories_[i]` are the infrequent categories for feature
         `i`. If the feature `i` has no infrequent categories
         `infrequent_categories_[i]` is None.
-    
+
     n_features_in_ : int
         Number of features seen during :term:`fit`.
     
@@ -268,7 +260,7 @@ class OneHotEncoder(SKL_OneHotEncoder):
     --------
     Given a dataset with two features, we let the encoder find the unique
     values per feature and transform the data to a binary one-hot encoding.
-    >>> from sklearn.preprocessing import OneHotEncoder
+    >>> from alpha_feature_tools.preprocess import OneHotEncoder
     One can discard categories not seen during `fit`:
     >>> enc = OneHotEncoder(handle_unknown='ignore')
     >>> X = [['Male', 1], ['Female', 3], ['Female', 2]]
