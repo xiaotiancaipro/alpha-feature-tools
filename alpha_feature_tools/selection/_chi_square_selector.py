@@ -28,13 +28,10 @@ class ChiSquareSelector(_BaseTransformer):
 
     def _fit(self, X: pd.DataFrame, y=None) -> None:
         for feature in self.feature_names_in_:
-            chi2_score, p_value = chi2(X[feature].values.reshape(-1, 1), y)
-            self.__feature_stats[feature] = {
-                "feature_name": feature,
-                "chi2_score": chi2_score[0],
-                "p_value": p_value[0]
-            }
-            if (self.k and (chi2_score[0] > self.k)) or (self.p_threshold and (p_value[0] <= self.p_threshold)):
+            chi2_value, p_value = chi2(X[feature].values.reshape(-1, 1), y)
+            feature_stats = {"feature_name": feature, "chi2_value": chi2_value[0], "p_value": p_value[0]}
+            self.__feature_stats[feature] = feature_stats
+            if (self.k and (chi2_value[0] > self.k)) or (self.p_threshold and (p_value[0] <= self.p_threshold)):
                 self._feature_names_out.append(feature)
         return None
 
