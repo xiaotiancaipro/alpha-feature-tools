@@ -53,7 +53,7 @@ class OutlierProcessor(_BaseTransformer):
         return X_transformed[self._feature_names_out]
 
     def _validate_keywords(self, X, y=None) -> tuple:
-        super()._validate_keywords(X, y)
+        X, y = super()._validate_keywords(X, y)
         if self.method not in ["std", "box"]:
             raise ValueError("method 必须是 'std' 或 'box'")
         if self.treatment not in ["mean", "cap", "none"]:
