@@ -27,17 +27,6 @@ class GroupStatistics(_BaseTransformer):
         self.group_stats = dict()
         super().__init__()
 
-    def _validate_keywords(self, X, y=None) -> tuple:
-        X, y = super()._validate_keywords(X, y)
-        if not isinstance(self.group_features, list):
-            raise ValueError("group_features must be a list")
-        for feature_group in self.group_features:
-            for feature in feature_group:
-                self.__unique_group_features.add(feature)
-                if feature not in self.feature_names_in_:
-                    raise ValueError(f"Group feature {feature_group} not in input features")
-        return X, y
-
     def _fit(self, X: pd.DataFrame, y=None) -> None:
         feature_names_in_ = list(set(self.feature_names_in_) - self.__unique_group_features)
         for feature_grouped in self.group_features:
@@ -61,3 +50,14 @@ class GroupStatistics(_BaseTransformer):
                 X[temp_feature] = eval(rum_str)
             X[feature] = X[temp_feature].map(lambda x: self.group_stats[feature][x])
         return X[self._feature_names_out]
+
+    def _validate_keywords(self, X, y=None) -> tuple:
+        X, y = super()._validate_keywords(X, y)
+        if not isinstance(self.group_features, list):
+            raise ValueError("group_features must be a list")
+        for feature_group in self.group_features:
+            for feature in feature_group:
+                self.__unique_group_features.add(feature)
+                if feature not in self.feature_names_in_:
+                    raise ValueError(f"Group feature {feature_group} not in input features")
+        return X, y
