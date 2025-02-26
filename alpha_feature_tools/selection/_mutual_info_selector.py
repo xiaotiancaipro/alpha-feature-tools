@@ -49,13 +49,14 @@ class MutualInfoSelector(_BaseTransformer):
         self.discrete_features = discrete_features
         self.n_neighbors = n_neighbors
         self.random_state = random_state
-        self.mi_scores_ = list()
+        self.__mi_scores = list()
+        self.__feature_stats = dict()
         super().__init__()
 
     def _fit(self, X: pd.DataFrame, y=None) -> None:
 
         if self.problem_type == 'classification':
-            self.mi_scores_ = mutual_info_classif(
+            self.__mi_scores = mutual_info_classif(
                 X=X,
                 y=y,
                 discrete_features=self.discrete_features,
@@ -64,7 +65,7 @@ class MutualInfoSelector(_BaseTransformer):
             )
 
         if self.problem_type == 'regression':
-            self.mi_scores_ = mutual_info_regression(
+            self.__mi_scores = mutual_info_regression(
                 X=X,
                 y=y,
                 discrete_features=self.discrete_features,
@@ -72,22 +73,24 @@ class MutualInfoSelector(_BaseTransformer):
                 random_state=self.random_state
             )
 
-        self.mi_scores_ = list(self.mi_scores_)
-
-        if self.k is not None:
-            temp_dict = {mi_score: index for index, mi_score in enumerate(self.mi_scores_)}
-            mi_scores_sorted = sorted(self.mi_scores_, reverse=True)
-            feature_names_out_sorted = [self.feature_names_in_[temp_dict[mi_score]] for mi_score in mi_scores_sorted]
-            self._feature_names_out = feature_names_out_sorted[:self.k]
-
-        if self.mi_threshold is not None:
-            for feature, mi_score in zip(self.feature_names_in_, self.mi_scores_):
-                if mi_score >= self.mi_threshold:
-                    self._feature_names_out.append(feature)
+        self.__mi_scores = list(self.__mi_scores)
+        self.__feature_stats = {fea: mi for fea, mi in zip(self.feature_names_in_, self.__mi_scores)}
 
         return None
 
     def _transform(self, X: pd.DataFrame) -> pd.DataFrame:
+
+        if self.k is not None:
+            temp_dict = {mi_score: index for index, mi_score in enumerate(self.__mi_scores)}
+            mi_scores_sorted = sorted(self.__mi_scores, reverse=True)
+            feature_names_out_sorted = [self.feature_names_in_[temp_dict[mi_score]] for mi_score in mi_scores_sorted]
+            self._feature_names_out = feature_names_out_sorted[:self.k]
+
+        if self.mi_threshold is not None:
+            for feature, mi_score in zip(self.feature_names_in_, self.__mi_scores):
+                if mi_score >= self.mi_threshold:
+                    self._feature_names_out.append(feature)
+
         return X[self._feature_names_out]
 
     def _validate_keywords(self, X, y=None) -> tuple:
@@ -102,3 +105,14 @@ class MutualInfoSelector(_BaseTransformer):
 
     def _more_tags(self):
         return super()._more_tags().update({"requires_y": True})
+
+    def set_k(self, k: int | None) -> None:
+        self.k = k
+        return None
+
+    def set_mi_threshold(self, mi_threshold: float | None) -> None:
+        self.mi_threshold = mi_threshold
+        return None
+
+    def get_feature_stats(self) -> dict:
+        return self.__feature_stats

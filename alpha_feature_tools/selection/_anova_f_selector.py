@@ -28,11 +28,15 @@ class ANOVAFSelector(_BaseTransformer):
             f_value, p_value = f_classif(X[feature].values.reshape(-1, 1), y)
             feature_stats = {"feature_name": feature, "f_value": f_value[0], "p_value": p_value[0]}
             self.__feature_stats[feature] = feature_stats
-            if (self.f and (f_value[0] > self.f)) or (self.p_threshold and (p_value[0] <= self.p_threshold)):
-                self._feature_names_out.append(feature)
         return None
 
     def _transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        for feature, stats in self.__feature_stats.items():
+            if (
+                    ((self.f is not None) and (stats["f_value"] > self.f)) or
+                    ((self.p_threshold is not None) and (stats["p_value"] <= self.p_threshold))
+            ):
+                self._feature_names_out.append(feature)
         return X[self._feature_names_out]
 
     def _validate_keywords(self, X, y=None) -> tuple:
@@ -43,6 +47,14 @@ class ANOVAFSelector(_BaseTransformer):
 
     def _more_tags(self):
         return super()._more_tags().update({"requires_y": True})
+
+    def set_f(self, f: float | None) -> None:
+        self.f = f
+        return None
+
+    def set_p_threshold(self, p_threshold: float | None) -> None:
+        self.p_threshold = p_threshold
+        return None
 
     def get_feature_stats(self) -> dict:
         return self.__feature_stats
