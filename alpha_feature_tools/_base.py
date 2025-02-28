@@ -25,11 +25,14 @@ class _BaseTransformer(TransformerMixin, BaseEstimator, ABC):
                 "Call 'fit' with appropriate arguments before using this transformer."
             )
         if not isinstance(X, pd.DataFrame):
-            X = pd.DataFrame(X)
-            X.columns = self.feature_names_in_
-        X_transform = X.copy()
-        if X_transform.columns.tolist() != self.feature_names_in_:
-            raise ValueError("Columns in X do not match columns in fit.")
+            X_transform = pd.DataFrame(X)
+            if len(X_transform.columns.tolist()) != len(self.feature_names_in_):
+                raise ValueError("Columns in X do not match columns in fit.")
+            X_transform.columns = self.feature_names_in_
+        else:
+            if X.columns.tolist() != self.feature_names_in_:
+                raise ValueError("Columns in X do not match columns in fit.")
+            X_transform = X.copy()
         return self._transform(X_transform).values
 
     def get_feature_names_out(self) -> list:
