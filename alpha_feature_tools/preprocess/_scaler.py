@@ -1,5 +1,6 @@
 from sklearn.preprocessing import StandardScaler as SKL_StandardScaler
 from sklearn.preprocessing import MinMaxScaler as SKL_MinMaxScaler
+from sklearn.preprocessing import Normalizer as SKL_Normalizer
 
 
 class StandardScaler(SKL_StandardScaler):
@@ -187,5 +188,62 @@ class MinMaxScaler(SKL_MinMaxScaler):
      [1.   1.  ]]
     >>> print(scaler.transform([[2, 2]]))
     [[1.5 0. ]]
+    """
+    pass
+
+
+class Normalizer(SKL_Normalizer):
+    """Normalize samples individually to unit norm.
+
+    Each sample (i.e. each row of the data matrix) with at least one
+    non zero component is rescaled independently of other samples so
+    that its norm (l1, l2 or inf) equals one.
+
+    This transformer is able to work both with dense numpy arrays and
+    scipy.sparse matrix (use CSR format if you want to avoid the burden of
+    a copy / conversion).
+
+    Scaling inputs to unit norms is a common operation for text
+    classification or clustering for instance. For instance the dot
+    product of two l2-normalized TF-IDF vectors is the cosine similarity
+    of the vectors and is the base similarity metric for the Vector
+    Space Model commonly used by the Information Retrieval community.
+
+    Read more in the :ref:`User Guide <preprocessing_normalization>`.
+
+    Parameters
+    ----------
+    norm : {'l1', 'l2', 'max'}, default='l2'
+        The norm to use to normalize each non zero sample. If norm='max'
+        is used, values will be rescaled by the maximum of the absolute
+        values.
+
+    copy : bool, default=True
+        Set to False to perform inplace row normalization and avoid a
+        copy (if the input is already a numpy array or a scipy.sparse
+        CSR matrix).
+
+    Attributes
+    ----------
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
+
+    Examples
+    --------
+    >>> from sklearn.preprocessing import Normalizer
+    >>> X = [[4, 1, 2, 2],
+    ...      [1, 3, 9, 3],
+    ...      [5, 7, 5, 1]]
+    >>> transformer = Normalizer().fit(X)  # fit does nothing.
+    >>> transformer
+    Normalizer()
+    >>> transformer.transform(X)
+    array([[0.8, 0.2, 0.4, 0.4],
+           [0.1, 0.3, 0.9, 0.3],
+           [0.5, 0.7, 0.5, 0.1]])
     """
     pass

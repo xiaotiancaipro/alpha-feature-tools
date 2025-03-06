@@ -1,7 +1,7 @@
 from ._encoder import LabelEncoder, OrdinalEncoder, OneHotEncoder
 from ._missing_value_processor import MissingValueProcessor
 from ._outlier_processor import OutlierProcessor
-from ._scaler import StandardScaler, MinMaxScaler
+from ._scaler import StandardScaler, MinMaxScaler, Normalizer
 from ._binner import FeatureBinner
 
 __ALL__ = [
@@ -12,5 +12,6 @@ __ALL__ = [
     "OutlierProcessor",
     "StandardScaler",
     "MinMaxScaler",
-    "FeatureBinner"
+    "FeatureBinner",
+    "Normalizer"
 ]
