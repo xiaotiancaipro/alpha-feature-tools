@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from tqdm.notebook import tqdm
+from sklearn.model_selection import train_test_split
 
 DATE_INFO = "date_info"
 DATE_MONTH = "date_month"
@@ -37,11 +38,11 @@ class Feature(object):
             l_1 = len(label_1_data)
             if l_1 / (l_0 + l_1) <= p:
                 n_0 = int(((1 - p) / p) * l_1)
-                sampled_label_0 = label_0_data.sample(n=n_0, random_state=42)
+                sampled_label_0 = label_0_data.sample(n=n_0, random_state=RANDOM_SEED)
                 sampled_group = pd.concat([sampled_label_0, label_1_data])
             else:
                 n_1 = int((p / (1 - p)) * l_0)
-                sampled_label_1 = label_1_data.sample(n=n_1, random_state=42)
+                sampled_label_1 = label_1_data.sample(n=n_1, random_state=RANDOM_SEED)
                 sampled_group = pd.concat([label_0_data, sampled_label_1])
             sampled_data.append(sampled_group)
         sampled_df = pd.concat(sampled_data)
@@ -71,7 +72,9 @@ class Feature(object):
         :param is_split: 是否直接返回切分后的数据集
         :return:
         """
+
         df_ = df.copy()
+
         if split_class == "train_test-oot":
             df_[sample_use] = df_[date_info].map(
                 lambda x: "train_test" if x < datetime.datetime(year, month, day) else "oot"
@@ -82,18 +85,25 @@ class Feature(object):
                     df_[df_[sample_use] == "oot"].drop(sample_use, axis=1)
                 )
             return df_
+
         df_[sample_use] = df_[date_info].map(
             lambda x: "train" if x < datetime.datetime(year, month, day) else "oot"
         )
-        df_test_index = df_[df_[sample_use] == "train"].sample(frac=0.25, random_state=RANDOM_SEED).index
-        df_.loc[df_test_index, sample_use] = "test"
+        df_train, df_test = train_test_split(
+            df_[df_[sample_use] == "train"],
+            test_size=0.25,
+            random_state=RANDOM_SEED,
+            shuffle=True
+        )
+        df_test[sample_use] = "test"
+        df_oot = df_[df_[sample_use] == "oot"]
         if is_split:
             return (
-                df_[df_[sample_use] == "train"].drop(sample_use, axis=1),
-                df_[df_[sample_use] == "test"].drop(sample_use, axis=1),
-                df_[df_[sample_use] == "oot"].drop(sample_use, axis=1)
+                df_train.drop(sample_use, axis=1),
+                df_test.drop(sample_use, axis=1),
+                df_oot.drop(sample_use, axis=1)
             )
-        return df_
+        return pd.concat([df_train, df_test, df_oot])
 
     @staticmethod
     def retrieval_rate(df: pd.DataFrame, feature_list: List[str], return_str: bool = False) -> str | None:
@@ -345,7 +355,7 @@ class Feature(object):
         save_dict = {"type": "str", "value": dict()}
         value_list = "df[_column].mode().tolist()" if stratepy == "mode" else f"[df[_column].{stratepy}()]"
         for _column in select_columns:
-            random.seed(1)
+            random.seed(RANDOM_SEED)
             missing_value = random.choice(eval(value_list))
             save_dict["value"][_column] = missing_value
             df[_column] = df[_column].fillna(missing_value)

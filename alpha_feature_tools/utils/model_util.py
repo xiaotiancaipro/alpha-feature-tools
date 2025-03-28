@@ -47,19 +47,28 @@ class Model(object):
         df_lift = df_lift.sort_values(by="__sort__", ascending=ascending).reset_index(drop=True)
         df_lift = df_lift.drop("__sort__", axis=1)
 
-        df_lift["Bad_Model(%)"] = df_lift["Bad"] / df_lift["Bad"].sum() * 100
-        df_lift["Bad_Random(%)"] = df_lift["Total"] / df_lift["Total"].sum() * 100
-        df_lift["Cumulative_Bad_Model(%)"] = df_lift["Bad_Model(%)"].cumsum()
-        df_lift["Cumulative_Bad_Random(%)"] = df_lift["Bad_Random(%)"].cumsum()
+        # df_lift["Bad_Model(%)"] = df_lift["Bad"] / df_lift["Bad"].sum() * 100
+        # df_lift["Bad_Random(%)"] = df_lift["Total"] / df_lift["Total"].sum() * 100
+        # df_lift["Cumulative_Bad_Model(%)"] = df_lift["Bad_Model(%)"].cumsum()
+        # df_lift["Cumulative_Bad_Random(%)"] = df_lift["Bad_Random(%)"].cumsum()
         # df_lift["Lift"] = df_lift["Cumulative_Bad_Model(%)"] / df_lift["Cumulative_Bad_Random(%)"]
-        df_lift["Lift"] = (df_lift["Bad"] / df_lift["Total"]) / (df_lift["Bad"].sum() / df_lift["Total"].sum())
+
+        df_lift["Bad_Bin(%)"] = df_lift["Bad"] / df_lift["Total"] * 100
+        df_lift["Bad_Total(%)"] = df_lift["Bad"].sum() / df_lift["Total"].sum() * 100
+        df_lift["Lift"] = df_lift["Bad_Bin(%)"] / df_lift["Bad_Total(%)"]
+
+        # df_lift["Total"] = df_lift["Total"].map(lambda x: f"{x:.0f}")
+        # df_lift["Bad"] = df_lift["Bad"].map(lambda x: f"{x:.0f}")
+        # df_lift["Bad_Model(%)"] = df_lift["Bad_Model(%)"].map(lambda x: f"{x:.6f}")
+        # df_lift["Bad_Random(%)"] = df_lift["Bad_Random(%)"].map(lambda x: f"{x:.6f}")
+        # df_lift["Cumulative_Bad_Model(%)"] = df_lift["Cumulative_Bad_Model(%)"].map(lambda x: f"{x:.6f}")
+        # df_lift["Cumulative_Bad_Random(%)"] = df_lift["Cumulative_Bad_Random(%)"].map(lambda x: f"{x:.6f}")
+        # df_lift["Lift"] = df_lift["Lift"].map(lambda x: f"{x:.6f}")
 
         df_lift["Total"] = df_lift["Total"].map(lambda x: f"{x:.0f}")
         df_lift["Bad"] = df_lift["Bad"].map(lambda x: f"{x:.0f}")
-        df_lift["Bad_Model(%)"] = df_lift["Bad_Model(%)"].map(lambda x: f"{x:.6f}")
-        df_lift["Bad_Random(%)"] = df_lift["Bad_Random(%)"].map(lambda x: f"{x:.6f}")
-        df_lift["Cumulative_Bad_Model(%)"] = df_lift["Cumulative_Bad_Model(%)"].map(lambda x: f"{x:.6f}")
-        df_lift["Cumulative_Bad_Random(%)"] = df_lift["Cumulative_Bad_Random(%)"].map(lambda x: f"{x:.6f}")
+        df_lift["Bad_Bin(%)"] = df_lift["Bad_Bin(%)"].map(lambda x: f"{x:.6f}")
+        df_lift["Bad_Total(%)"] = df_lift["Bad_Total(%)"].map(lambda x: f"{x:.6f}")
         df_lift["Lift"] = df_lift["Lift"].map(lambda x: f"{x:.6f}")
 
         return df_lift
