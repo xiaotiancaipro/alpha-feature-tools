@@ -53,10 +53,6 @@ class Model(object):
         # df_lift["Cumulative_Bad_Random(%)"] = df_lift["Bad_Random(%)"].cumsum()
         # df_lift["Lift"] = df_lift["Cumulative_Bad_Model(%)"] / df_lift["Cumulative_Bad_Random(%)"]
 
-        df_lift["Bad_Bin(%)"] = df_lift["Bad"] / df_lift["Total"] * 100
-        df_lift["Bad_Total(%)"] = df_lift["Bad"].sum() / df_lift["Total"].sum() * 100
-        df_lift["Lift"] = df_lift["Bad_Bin(%)"] / df_lift["Bad_Total(%)"]
-
         # df_lift["Total"] = df_lift["Total"].map(lambda x: f"{x:.0f}")
         # df_lift["Bad"] = df_lift["Bad"].map(lambda x: f"{x:.0f}")
         # df_lift["Bad_Model(%)"] = df_lift["Bad_Model(%)"].map(lambda x: f"{x:.6f}")
@@ -64,6 +60,10 @@ class Model(object):
         # df_lift["Cumulative_Bad_Model(%)"] = df_lift["Cumulative_Bad_Model(%)"].map(lambda x: f"{x:.6f}")
         # df_lift["Cumulative_Bad_Random(%)"] = df_lift["Cumulative_Bad_Random(%)"].map(lambda x: f"{x:.6f}")
         # df_lift["Lift"] = df_lift["Lift"].map(lambda x: f"{x:.6f}")
+
+        df_lift["Bad_Bin(%)"] = df_lift["Bad"] / df_lift["Total"] * 100
+        df_lift["Bad_Total(%)"] = df_lift["Bad"].sum() / df_lift["Total"].sum() * 100
+        df_lift["Lift"] = df_lift["Bad_Bin(%)"] / df_lift["Bad_Total(%)"]
 
         df_lift["Total"] = df_lift["Total"].map(lambda x: f"{x:.0f}")
         df_lift["Bad"] = df_lift["Bad"].map(lambda x: f"{x:.0f}")
@@ -127,18 +127,18 @@ class Model(object):
             "KS_Train": "{:.6f}".format(train_evaluate["ks"]),
             "KS_Test": "{:.6f}".format(test_evaluate["ks"]),
             "KS_OOT": "{:.6f}".format(oot_evaluate["ks"]),
-            "KS_TT": "{:.6f}".format(train_evaluate["ks"] - test_evaluate["ks"]),
-            "KS_TO": "{:.6f}".format(test_evaluate["ks"] - oot_evaluate["ks"]),
+            # "KS_TT": "{:.6f}".format(train_evaluate["ks"] - test_evaluate["ks"]),
+            # "KS_TO": "{:.6f}".format(test_evaluate["ks"] - oot_evaluate["ks"]),
             "AUC_Train": "{:.6f}".format(train_evaluate["auc"]),
             "AUC_Test": "{:.6f}".format(test_evaluate["auc"]),
             "AUC_OOT": "{:.6f}".format(oot_evaluate["auc"]),
-            "AUC_TT": "{:.6f}".format(train_evaluate["auc"] - test_evaluate["auc"]),
-            "AUC_TO": "{:.6f}".format(test_evaluate["auc"] - oot_evaluate["auc"]),
-            "Model_Type": model_name,
-            "Model_Version": model_version,
-            "Model_Params": "\"{}\"".format(best_params),
-            "Feature_Version": feature_version,
+            # "AUC_TT": "{:.6f}".format(train_evaluate["auc"] - test_evaluate["auc"]),
+            # "AUC_TO": "{:.6f}".format(test_evaluate["auc"] - oot_evaluate["auc"]),
             "Dataset_Name": dataset_name,
+            "Model_Version": model_version,
+            "Feature_Version": feature_version,
+            "Model_Type": model_name,
+            "Model_Params": "\"{}\"".format(best_params),
             "Time": datetime.datetime.now().isoformat()
         }
         if not os.path.exists(save_file):
