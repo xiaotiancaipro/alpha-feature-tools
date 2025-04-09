@@ -5,8 +5,10 @@ from typing import List, Tuple, Dict
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from tqdm.notebook import tqdm
+from IPython.display import display
+from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
+from tqdm.notebook import tqdm
 
 DATE_INFO = "date_info"
 DATE_MONTH = "date_month"
@@ -690,3 +692,34 @@ class Feature(object):
         r_5_2 = np.round(df[score_column].mean(), 6)
         data_list = [[r_1_1, r_1_2], [r_2_1, r_2_2], [r_3_1, r_3_2], [r_4_1, r_4_2], [r_5_1, r_5_2]]
         return pd.DataFrame(data_list, columns=["概率", "分值"], index=["范围", "极差", "众数", "中位数", "平均值"])
+
+    @staticmethod
+    def evaluate_probability_groups(
+            df: pd.DataFrame,
+            y_true: str,
+            score_1: str,
+            score_2: str,
+            n_groups: int = 2,
+            is_display: bool = True
+    ) -> dict:
+        _, bins = pd.qcut(df[score_1], q=n_groups, retbins=True)
+        df_result, bins_dict = list(), dict()
+        for index in range(len(bins) - 1):
+            lower = bins[index]
+            upper = bins[index + 1]
+            bins_dict[index] = {"lower": lower, "upper": upper}
+            mask = (df[score_1] >= lower) & (
+                (df[score_1] < upper) if index < (len(bins) - 2) else (df[score_1] <= upper))
+            group_y_true = df[y_true][mask]
+            group_y_score_1 = df[score_1][mask]
+            group_y_score_2 = df[score_2][mask]
+            df_result.append({
+                "Group": index,
+                "Probability Range": f"{lower:.6f}-{upper:.6f}",
+                "Sample Size": sum(mask),
+                f"AUC_{score_1}": roc_auc_score(group_y_true, group_y_score_1),
+                f"AUC_{score_2}": roc_auc_score(group_y_true, group_y_score_2)
+            })
+        if is_display:
+            display(pd.DataFrame(df_result))
+        return bins_dict

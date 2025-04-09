@@ -1,6 +1,6 @@
 [project]
 name = "alpha-feature-tools"
-version = "0.0.3"
+version = "0.0.4"
 description = "Feature Engineering Tools"
 authors = [
     { name = "xiaotiancaipro", email = "xiaotiancaipro@163.com" }
@@ -14,7 +14,8 @@ dependencies = [
     "matplotlib (==3.8.4)",
     "tqdm (==4.66.2)",
     "sklearn2pmml (==0.99.3)",
-    "sklearn-pandas (==2.2.0)"
+    "sklearn-pandas (==2.2.0)",
+    "ipython (==8.26.0)"
 ]
 
 
